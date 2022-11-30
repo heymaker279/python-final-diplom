@@ -1,0 +1,2 @@
+[run]
+omit=tests/*,.venv/*,shopping_service/*,manage.py,*tests.py

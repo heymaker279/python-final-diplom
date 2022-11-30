@@ -1,0 +1,60 @@
+shop: DNS
+categories:
+  - id: 224
+    name: Смартфоны
+  - id: 3
+    name: Ноутбуки
+  - id: 1
+    name: Flash-накопители
+
+goods:
+  - id: 123
+    category: 224
+    model: samsung/galaxy/a13
+    name: Смартфон Samsung Galaxy A13 512GB (белый)
+    price: 11990
+    price_rrc: 13000
+    quantity: 20
+    parameters:
+      "Диагональ (дюйм)": 6.6
+      "Разрешение (пикс)": 2408x1080
+      "Встроенная память (Гб)": 32
+      "Цвет": белый
+  - id: 124
+    category: 224
+    model: samsung/galaxy/a33
+    name: Смартфон Samsung Galaxy A33 128GB (красный)
+    price: 25990
+    price_rrc: 27000
+    quantity: 30
+    parameters:
+      "Диагональ (дюйм)": 6.4
+      "Разрешение (пикс)": 2400x1080
+      "Встроенная память (Гб)": 128
+      "Цвет": красный
+  - id: 125
+    category: 224
+    model: samsung/galaxy/s21
+    name: Смартфон Samsung Galaxy S21 128GB (черный)
+    price: 44999
+    price_rrc: 47000
+    quantity: 10
+    parameters:
+      "Диагональ (дюйм)": 6.4
+      "Разрешение (пикс)": 2340x1080
+      "Встроенная память (Гб)": 128
+      "Цвет": черный
+  - id: 468
+    category: 3
+    model: huawei/matebook/14shkf-x
+    name: Ноутбук HUAWEI MateBook 14S HKF-X (серый)
+    price: 106999
+    price_rrc: 110000
+    quantity: 15
+    parameters:
+      "Диагональ (дюйм)": 14.2
+      "Разрешение (пикс)": 2520x1680
+      "Встроенная память (Гб)": 1000
+      "Цвет": серый
+      "Процессор": Intel Core i7-12700H
+      "Оперативная память (Гб)": 16
