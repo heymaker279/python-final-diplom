@@ -7,13 +7,15 @@ networks:
 services:
 
   redis:
+    networks:
+      - backend
     image: redis
     ports:
       - "6379:6379"
+
+  db:
     networks:
       - backend
-#
-  db:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./logs:/var/log
@@ -25,8 +27,6 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     restart: unless-stopped
-    networks:
-      - backend
     env_file:
       - ./.env
     healthcheck:
@@ -35,29 +35,33 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
-#
+
 #  nginx:
-#    build: ./nginx
 #    networks:
 #      - backend
+#    image: nginx:1.21-alpine
 #    volumes:
-#      - static_volume:/home/app/web/staticfiles
+#      - static_volume:/var/www/html/static
+#      - ./nginx:/etc/nginx/conf.d
 #    ports:
-#      - 8888:80
+#      - 80:80
 #    depends_on:
 #      - web
 #
 #  web:
-#    build: .
-#    volumes:
-#      - static_volume:/home/app/web/staticfiles
-#    depends_on:
-#      - db # старт после старта контейнера postgres
-#    expose:
-#      - 8000
-#    restart: unless-stopped
 #    networks:
 #      - backend
+#    build: .
+#    volumes:
+#      - static_volume:/usr/src/app/static
+#      - .:/usr/src/app/
+#    depends_on:
+#      - db # старт после старта контейнера postgres
+#    ports:
+#      - 8080:8000
+#    restart: unless-stopped
 #    entrypoint: "/usr/src/app/entrypoint.sh"
+#    command:
+#      - chmod +x /usr/src/app/entrypoint.sh
 #    env_file:
 #      - ./.env

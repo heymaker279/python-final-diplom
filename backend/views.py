@@ -1,8 +1,8 @@
 import yaml
 import re
+from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
 from backend.permissions import IsOwner, IsShop
 from backend.tasks import new_order_send_message, new_user_register_send_message, canceled_order_send_mail
 from requests import get
@@ -33,8 +33,8 @@ class RegisterAccount(APIView):
     def post(self, request):
         """
         Регистрация нового пользователя
-        :param request: запрос пользователя с обязательными параметрами в теле запроса
-        :return: добавляет нового пользователя и/или возвращает статус ответа
+        \n:param request: запрос пользователя с обязательными параметрами в теле запроса
+        \n:return: добавляет нового пользователя и/или возвращает статус ответа
         """
         if {'first_name', 'last_name', 'email', 'password', 'company', 'position'}.issubset(
                 request.data):  # проверяем обязательные аргументы
@@ -67,9 +67,9 @@ class ConfirmAccount(APIView):
     def post(self, request):
         """
         Подтверждение адреса электронной почты
-        :param request: запрос пользователя с обязательными параметрами: email и token который придет на почту после
+        \n:param request: запрос пользователя с обязательными параметрами: email и token который придет на почту после
             регистрации пользователя
-        :return: возвращает статус ответа
+        \n:return: возвращает статус ответа
         """
         if {'email', 'token'}.issubset(request.data):  # проверяем обязательные аргументы
             token = ConfirmEmailToken.objects.filter(user__email=request.data['email'],
@@ -85,7 +85,9 @@ class ConfirmAccount(APIView):
         return JsonResponse({'Status': False, 'Errors': 'All necessary arguments are not specified'})
 
 
-class AccountDetailsViewSet(ModelViewSet):
+class AccountDetailsViewSet(mixins.ListModelMixin,
+                            mixins.CreateModelMixin,
+                            viewsets.GenericViewSet):
     """
     Класс для работы данными пользователя
     """
@@ -96,8 +98,8 @@ class AccountDetailsViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):  # получить данные
         """
         Получение данных о пользователе
-        :param request: запрос пользователя
-        :return: возвращает полные данные о пользователе
+        \n:param request: запрос пользователя
+        \n:return: возвращает полные данные о пользователе
         """
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
@@ -105,8 +107,8 @@ class AccountDetailsViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         """
         Редактирование персональных данных пользователя
-        :param request: запрос пользователя с обязательным параметром password
-        :return: добавляет или обновляет данные и/или возвращает статус ответа
+        \n:param request: запрос пользователя с обязательным параметром password
+        \n:return: добавляет или обновляет данные и/или возвращает статус ответа
         """
         if 'password' in request.data:  # проверяем обязательные аргументы
             try:
@@ -134,8 +136,8 @@ class LoginAccount(APIView):
     def post(self, request):
         """
         Авторизация пользователя методом POST
-        :param request: запрос пользователя с email и password в теле запроса
-        :return: возвращает токен пользователя и/или статус ответа
+        \n:param request: запрос пользователя с email и password в теле запроса
+        \n:return: возвращает токен пользователя и/или статус ответа
         """
         if {'email', 'password'}.issubset(request.data):
             user = authenticate(request, username=request.data['email'], password=request.data['password'])
@@ -155,8 +157,8 @@ class ContactView(APIView):
     def get(self, request):
         """
         Получение контактных данных
-        :param request: запрос пользователя
-        :return: возвращает список с контактными данными
+        \n:param request: запрос пользователя
+        \n:return: возвращает список с контактными данными
         """
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -168,8 +170,8 @@ class ContactView(APIView):
     def post(self, request):
         """
         Добавление контактных данных
-        :param request: запрос ползователя с данными в теле запроса
-        :return: добавляет данные и/или возвращает статус ответа
+        \n:param request: запрос ползователя с данными в теле запроса
+        \n:return: добавляет данные и/или возвращает статус ответа
         """
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -194,8 +196,8 @@ class ContactView(APIView):
     def delete(self, request):
         """
         Удаление контактных данных
-        :param request: запрос пользователя с идентификатором списка контактных данных
-        :return: удаляет контактные данные и возвращает количество удаленных объектов
+        \n:param request: запрос пользователя с идентификатором списка контактных данных
+        \n:return: удаляет контактные данные и возвращает количество удаленных объектов
         """
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -216,8 +218,8 @@ class ContactView(APIView):
     def put(self, request):
         """
         Изменение контактных данных
-        :param request: запрос пользователя с обновленными данными в теле запроса
-        :return: обновляет данные и/или возвращает статус ответа
+        \n:param request: запрос пользователя с обновленными данными в теле запроса
+        \n:return: обновляет данные и/или возвращает статус ответа
         """
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -259,8 +261,8 @@ class ProductInfoView(APIView):
     def get(self, request):
         """
         Получение списка товаров или характеристики товара
-        :param request: запрос пользователя с указанием или без указания необязательных параметров
-        :return: без указания параметров возвращает список всех товаров
+        \n:param request: запрос пользователя с указанием или без указания необязательных параметров
+        \n:return: без указания параметров возвращает список всех товаров
                 при указании category_id=<int> возвращает отсортированный по категории список товаров
                 при указании shop_id=<int> возвращает список товаров определенного магазина
                 при указании product_id=<int> возвращает список с характеристиками определенного товара
@@ -288,7 +290,9 @@ class ProductInfoView(APIView):
             return JsonResponse({'Status': False, 'Error': error})
 
 
-class BasketViewSet(ModelViewSet):
+class BasketViewSet(mixins.ListModelMixin,
+                            mixins.CreateModelMixin,
+                            viewsets.GenericViewSet):
     """
     Класс для работы с корзиной пользователя
     """
@@ -299,8 +303,8 @@ class BasketViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         """
         Получение информации о корзине
-        :param request: запрос пользователя
-        :return: возвращает id заказа, список товаров добавленных в корзину, статус заказа, дату формирования,
+        \n:param request: запрос пользователя
+        \n:return: возвращает id заказа, список товаров добавленных в корзину, статус заказа, дату формирования,
         общую сумму заказа и контактные данные покупателя
         """
         basket = Order.objects.filter(
@@ -314,9 +318,9 @@ class BasketViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         """
         Создание корзины или добавление новых товаров в уже существующую
-        :param request: запрос клиента со словарем в теле запроса
+        \n:param request: запрос клиента со словарем в теле запроса
         формата - "items": [{"quantity":<int>, "product_info":<int>},{...}]
-        :return: создает новый заказ со статусом basket, возвращает статус запроса
+        \n:return: создает новый заказ со статусом basket, возвращает статус запроса
         и количество добавленных наименований товаров
         """
         items_sting = request.data.get('items')
@@ -349,9 +353,9 @@ class BasketViewSet(ModelViewSet):
         """
         Удаление товаров из корзины
         При выполнении этого запроса, к базовому url этого класса нужно добавить /delete/
-        :param request: запрос пользователя со строкой позиций товаров в корзине перечисленных
+        \n:param request: запрос пользователя со строкой позиций товаров в корзине перечисленных
         через запятую формата - {"items": "<int>,<int>"}
-        :return: удааляет выбранные позиции и возвращает количество удаленных наименований товаров
+        \n:return: удааляет выбранные позиции и возвращает количество удаленных наименований товаров
         """
         items_sting = request.data.get('items')
         if items_sting:
@@ -376,9 +380,9 @@ class BasketViewSet(ModelViewSet):
         """
         Обновление количества ранее добавленных товаров в корзине
         При выполнении этого запроса, к базовому url этого класса нужно добавить /put/
-        :param request: запрос пользователя со строкой внутри словаря с id позиций товаров в корзине перечисленных
+        \n:param request: запрос пользователя со строкой внутри словаря с id позиций товаров в корзине перечисленных
         через запятую формата - "items": [{"quantity":<int>, "id":<int>},{...}] - где id  это id позиции в корзине
-        :return: обновляет количество выбранных позиций и возвращает количество обновленых товаров
+        \n:return: обновляет количество выбранных позиций и возвращает количество обновленых товаров
         """
         items_sting = request.data.get('items')
         if items_sting:
@@ -398,7 +402,9 @@ class BasketViewSet(ModelViewSet):
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
 
-class OrderViewSet(ModelViewSet):
+class OrderViewSet(mixins.ListModelMixin,
+                    mixins.CreateModelMixin,
+                    viewsets.GenericViewSet):
     """
     Класс для получения и размешения заказов пользователями
     """
@@ -409,8 +415,8 @@ class OrderViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         """
         Получение информации о заказе
-        :param request: запрос пользователя
-        :return: возвращает id заказа, список товаров, статус заказа, дату формирования,
+        \n:param request: запрос пользователя
+        \n:return: возвращает id заказа, список товаров, статус заказа, дату формирования,
         общую сумму заказа и контактные данные покупателя
         """
         order = Order.objects.filter(  # формирование информации
@@ -424,9 +430,9 @@ class OrderViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         """
         Размещение заказа из корзины
-        :param request: запрос пользователя со словарем формата - {"id":<int>, "contact":<int>}
+        \n:param request: запрос пользователя со словарем формата - {"id":<int>, "contact":<int>}
         - где id  это id заказа, contact это id контакта пользователя
-        :return: меняет статус заказа с basket на new, возвращает статус ответа и уведомление об отправке пользователю
+        \n:return: меняет статус заказа с basket на new, возвращает статус ответа и уведомление об отправке пользователю
         сообщения с информацией о заказе
         """
         if {'id', 'contact'}.issubset(request.data):
@@ -468,8 +474,8 @@ class OrderViewSet(ModelViewSet):
         """
         Отмена и удаление оформленного заказа
         При выполнении этого запроса, к базовому url этого класса нужно добавить /delete/
-        :param request: запрос пользователя с id заказа формата - {"id":<int>}
-        :return: удааляет заказ со статусом new и добавляет обратно в базу данных все позиции из заказа,
+        \n:param request: запрос пользователя с id заказа формата - {"id":<int>}
+        \n:return: удааляет заказ со статусом new и добавляет обратно в базу данных все позиции из заказа,
         возвращает статус ответа и сообщение с номером удаленного заказа
         """
         try:
@@ -491,7 +497,9 @@ class OrderViewSet(ModelViewSet):
             return JsonResponse({'Status': False, 'Errors': 'error'})
 
 
-class PartnerStateViewSet(ModelViewSet):
+class PartnerStateViewSet(mixins.ListModelMixin,
+                          mixins.CreateModelMixin,
+                          viewsets.GenericViewSet):
     """
     Класс для работы со статусом поставщика
     """
@@ -502,8 +510,8 @@ class PartnerStateViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         """
         Получение текущего статуса магазина
-        :param request: запрос пользователя
-        :return: возвращает id магазина, название, статус магазина (принимает или не принимает заказы)
+        \n:param request: запрос пользователя
+        \n:return: возвращает id магазина, название, статус магазина (принимает или не принимает заказы)
         """
         shop = request.user.shop
         serializer = ShopSerializer(shop)
@@ -512,8 +520,8 @@ class PartnerStateViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         """
         Изменение текущего статуса магазина
-        :param request: запрос пользователя со статусом формата - {"state":<bool>} где bool = 0 или 1
-        :return: меняет статус магазина и возвращает статус ответа
+        \n:param request: запрос пользователя со статусом формата - {"state":<bool>} где bool = 0 или 1
+        \n:return: меняет статус магазина и возвращает статус ответа
         """
         state = request.data.get('state')
         if state:
@@ -526,7 +534,8 @@ class PartnerStateViewSet(ModelViewSet):
         return JsonResponse({'Status': False, 'Errors': 'All necessary arguments are not specified'})
 
 
-class PartnerOrdersViewSet(ModelViewSet):
+class PartnerOrdersViewSet(mixins.ListModelMixin,
+                           viewsets.GenericViewSet):
     """
     Класс для получения заказов поставщиками
     """
@@ -537,8 +546,8 @@ class PartnerOrdersViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         """
         Получение списка заказов магазином
-        :param request: запрос пользователя
-        :return: возвращает id заказа, список товаров, статус заказа, дату формирования,
+        \n:param request: запрос пользователя
+        \n:return: возвращает id заказа, список товаров, статус заказа, дату формирования,
         общую сумму заказа и контактные данные покупателя
         """
         try:
@@ -562,12 +571,12 @@ class PartnerUpdate(APIView):
     def post(self, request, *args, **kwargs):
         """
         Добавление и обновление информации от поставщика
-        :param request: запрос пользователя с указанием минимум одного из двух параметров в теле запроса
+        \n:param request: запрос пользователя с указанием минимум одного из двух параметров в теле запроса
         в которых нужно указать путь к данным формата yaml
         пример -
         {'url': 'https://path_to_file.yaml'} путь к url с данными
         {'file': 'data/data.yaml'} относительный или абсолютный путь к yaml файлу
-        :return: добавляет информацию в базу данных и возвращает статус ответа
+        \n:return: добавляет информацию в базу данных и возвращает статус ответа
         """
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)

@@ -100,7 +100,7 @@ class Shop(models.Model):
     """
     name = models.CharField(max_length=50, verbose_name='Название', unique=True)
     url = models.URLField(verbose_name='Ссылка', null=True, blank=True)  # url ссылка на данные о товарах от поставщика в yaml формате
-    filename = models.CharField(max_length=200, null=True, blank=True)  # путь к файлу с данными о товаре от поставщика
+    filename = models.CharField(verbose_name='путь к файлу', max_length=200, null=True, blank=True)  # путь к файлу с данными о товаре от поставщика
     state = models.BooleanField(default=True, verbose_name='Статус получения заказов')
     user = models.OneToOneField(User, verbose_name='пользователь', blank=True, null=True, on_delete=models.CASCADE)
 
@@ -221,7 +221,7 @@ class Order(models.Model):
     Модель с информацией о заказе
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='orders')
-    dt = models.DateTimeField(auto_now_add=True)
+    dt = models.DateTimeField(auto_now_add=True, verbose_name='время создания заказа')
     state = models.CharField(max_length=35, verbose_name='Статус заказа', choices=ORDER_CHOICES, default="in_process")
     contact = models.ForeignKey('Contact', verbose_name='Контакт', blank=True, null=True, on_delete=models.CASCADE)
 

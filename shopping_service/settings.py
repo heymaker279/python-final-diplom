@@ -11,16 +11,16 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 import sys
+
 from dotenv import dotenv_values
 from pathlib import Path
-from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = dotenv_values('.env')
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -37,20 +37,41 @@ ALLOWED_HOSTS = env['ALLOWED_HOSTS'].split(' ')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'backend.apps.BackendConfig',
+
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
     'django_celery_results',
     'unittest',
-
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.vk',
+    'allauth.socialaccount.providers.telegram',
 ]
+
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = 'backend'
+LOGOUT_REDIRECT_URL = 'backend'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'vk': {
+        },
+    'telegram': {
+        'TOKEN': 'insert-token-received-from-botfather'
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -138,7 +159,27 @@ AUTH_USER_MODEL = 'backend.User'
 
 DEFAULT_CHARSET = 'UTF-8'
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API Сервис заказа товаров для розничных сетей',
+    'DESCRIPTION': 'Приложение предназначено для автоматизации закупок в розничной сети. Пользователи сервиса'
+                   ' — покупатель (менеджер торговой сети, который закупает товары для продажи в магазине)'
+                   ' и поставщик товаров.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
+
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
     ],
