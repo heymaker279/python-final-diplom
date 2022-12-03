@@ -1,7 +1,6 @@
 version: '3.9'
 volumes:
   pgdata:
-#  static_volume:
 networks:
   backend:
 services:
@@ -54,14 +53,14 @@ services:
 #    build: .
 #    volumes:
 #      - static_volume:/usr/src/app/static
-#      - .:/usr/src/app/
+#      - '.:/usr/src/app/'
 #    depends_on:
 #      - db # старт после старта контейнера postgres
 #    ports:
 #      - 8080:8000
 #    restart: unless-stopped
-#    entrypoint: "/usr/src/app/entrypoint.sh"
-#    command:
-#      - chmod +x /usr/src/app/entrypoint.sh
+#
+##    command: sh -c "chmod +x /usr/src/app/entrypoint.sh "
+##    entrypoint: ["/usr/src/app/entrypoint.sh"]
 #    env_file:
 #      - ./.env

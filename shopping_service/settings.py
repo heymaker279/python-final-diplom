@@ -19,7 +19,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = dotenv_values('.env')
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / 'static/'
+]
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Quick-start development settings - unsuitable for production
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'backend.apps.BackendConfig',
+    'crispy_forms',
 
     'django_filters',
     'rest_framework',
@@ -56,21 +60,33 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.vk',
-    'allauth.socialaccount.providers.telegram',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.yandex',
+
 ]
 
-SITE_ID = 1
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-LOGIN_REDIRECT_URL = 'backend'
-LOGOUT_REDIRECT_URL = 'backend'
+SITE_ID = 2
+ACCOUNT_SESSION_REMEMBER = True
+LOGIN_REDIRECT_URL = 'home'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+ACCOUNT_EMAIL_REQUIRED = True
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 
 SOCIALACCOUNT_PROVIDERS = {
-    'vk': {
-        },
-    'telegram': {
-        'TOKEN': 'insert-token-received-from-botfather'
-    }
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    },
 }
 
 MIDDLEWARE = [
@@ -88,7 +104,7 @@ ROOT_URLCONF = 'shopping_service.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
